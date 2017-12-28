@@ -55,9 +55,9 @@ function install_packages {
     sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib nginx
     sudo apt-get install python3
     sudo apt-get install python3-setuptools
-    apt-get install supervisor
+    sudo apt-get install supervisor
     sudo easy_install3 pip
-    pip3 install virtualenv
+    sudo pip3 install virtualenv
 }
 
 
@@ -91,7 +91,7 @@ install_packages
 virtualenv venv
 source venv/bin/activate
 cd $project_dir
-pip3 install -r requirements.txt
+sudo pip3 install -r requirements.txt
 pause
 
 cd /etc/nginx/sites-available/
