@@ -43,10 +43,10 @@ startretries=10
 killasgroup=true
 priority=997"
     echo -e "$supervisor_config" > /etc/supervisor/conf.d/start_server.conf
-    supervisorctl reread
-    supervisorctl update
-    supervisorctl status start_server
-    supervisorctl restart start_server
+    sudo supervisorctl reread
+    sudo supervisorctl update
+    sudo supervisorctl status start_server
+    sudo supervisorctl restart start_server
 }
 
 
@@ -88,10 +88,12 @@ echo Domain URL:
 read domain
 
 install_packages
+cd /opt
 virtualenv venv
 source venv/bin/activate
 cd $project_dir
 sudo pip3 install -r requirements.txt
+sudo pip3 install gunicorn
 pause
 
 cd /etc/nginx/sites-available/
