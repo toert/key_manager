@@ -7,30 +7,16 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import requests
 import numpy
 
 from api.models import Key
-
-
-API_URL = 'http://localhost:8000/api/'
 
 
 @csrf_exempt
 def prediction(request):
     try:
         request_data = json.loads(request.body.decode('utf-8'))
-        key_queryset = Key.objects.filter(key=request_data['key'])
-        if not key_queryset.exists():
-            return JsonResponse({'error': "Key doesn't exists"})
-        key_in_db = key_queryset.first()
-        if not key_in_db.is_available():
-            return JsonResponse({'error': 'Wait until end of a timeout'})
-
-        proportions = key_in_db.calculate_recommended_proportions(
-            M=numpy.array(request_data['matrix'])
-        )
-        return JsonResponse({'result': [float(proportion) for proportion in proportions],
+        return JsonResponse({'result': get_prediction(request_data['key'], request_data['matrix']),
                              'error': False})
     except Exception as e:
         traceback = sys.exc_info()[-1]
@@ -52,8 +38,21 @@ def test_predictions(request, key, features_amount, timeframes_amount, currencie
         matrix = request_data['matrix']
     else:
         return JsonResponse({'TEST_RESULT': 'Forbidden method'})
-    response = requests.post(API_URL, json={'key': key, 'matrix': matrix}).text
-    print(response)
+    prediction = get_prediction(key, matrix)
     key_in_db.last_request_time = last_request_time
     key_in_db.save()
-    return JsonResponse({'TEST_RESULT': response})
+    return JsonResponse({'TEST_RESULT': prediction})
+
+
+def get_prediction(key, matrix):
+    key_queryset = Key.objects.filter(key=key)
+    if not key_queryset.exists():
+        return JsonResponse({'error': "Key doesn't exists"})
+    key_in_db = key_queryset.first()
+    if not key_in_db.is_available():
+        return JsonResponse({'error': 'Wait until end of a timeout'})
+
+    proportions = key_in_db.calculate_recommended_proportions(
+        M=numpy.array(matrix)
+    )
+    return [float(proportion) for proportion in proportions]
