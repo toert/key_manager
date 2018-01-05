@@ -7,6 +7,7 @@ server {
     listen 80;
     server_name $1;
     access_log  /var/log/nginx/example.log;
+    error_log /opt/nginx-errors.log error;
 
     location /static/ {
         root $2;
@@ -43,10 +44,10 @@ startretries=10
 killasgroup=true
 priority=997"
     echo -e "$supervisor_config" > /etc/supervisor/conf.d/start_server.conf
-    sudo supervisorctl reread
-    sudo supervisorctl update
-    sudo supervisorctl status start_server
-    sudo supervisorctl restart start_server
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status start_server
+sudo supervisorctl restart start_server
 }
 
 
