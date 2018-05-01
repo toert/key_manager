@@ -5,9 +5,12 @@ from random import random
 from datetime import datetime
 
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
 import numpy
+import requests
 
 from api.models import Key
 
@@ -56,3 +59,13 @@ def get_prediction(key, matrix):
     )
     print(proportions)
     return {'result': [float(proportion) for proportion in proportions]}
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class Proxy(View):
+
+    @csrf_exempt
+    def post(self, request):
+        request_data = json.loads(request.body.decode('utf-8'))
+        response = requests.get(request_data['domain'], params=request_data['params']).text
+        return HttpResponse(response)
