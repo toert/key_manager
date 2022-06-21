@@ -6,7 +6,7 @@ enum34==1.1.6
 html5lib==0.9999999
 idna==2.6
 Markdown==2.6.10
-numpy==1.13.3
+numpy==1.22.0
 protobuf==3.5.1
 pytz==2017.3
 requests==2.18.4
